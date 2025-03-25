@@ -13,7 +13,6 @@ import java.util.Scanner;
 public class App{
     private static String carpetaSeleccionada = null;
     private static String ficheroSeleccionado = null;
-    private static List<Map<String, String>> datos = new ArrayList<>();
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int opcion; 
