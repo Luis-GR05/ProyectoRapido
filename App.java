@@ -66,13 +66,5 @@ public class App{
             System.out.println("La carpeta no existe.");
         }
     }
-
-    public static void leerFichero(String nombre){
-
-    }
-
-    public static void convertirFichero(String tipo){
-
-    }
 }
 
