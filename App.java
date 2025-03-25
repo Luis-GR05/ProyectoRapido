@@ -15,7 +15,6 @@ public class App{
     private static String ficheroSeleccionado = null;
     private static List<Map<String, String>> datos = new ArrayList<>();
     public static void main(String[] args) {
-        mostrarMenu();
         Scanner sc = new Scanner(System.in);
         int opcion; 
         do{ 
