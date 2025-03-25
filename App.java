@@ -7,9 +7,7 @@ import java.util.Scanner;
  */
 public class App{
     public static void main(String[] args) {
-<<<<<<< HEAD
         mostrarMenu();
-=======
         Scanner sc = new Scanner(System.in);
         int opcion;
         mostrarMenu(); 
@@ -31,7 +29,6 @@ public class App{
             }
         }while(opcion != 4);
         sc.close();
->>>>>>> Luis
     }
 
     public static void mostrarMenu(){
