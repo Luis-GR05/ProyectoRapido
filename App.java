@@ -1,8 +1,5 @@
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -27,6 +24,26 @@ public class App{
                     break;
                 
                 case 2:
+                    System.out.println("Introduce el nombre del fichero");
+                    String nombre = sc.nextLine();
+                    try {
+                        File archivo = new File(carpetaSeleccionada, nombre);
+                        if (archivo.exists() && archivo.isFile()) {
+                        ficheroSeleccionado = nombre;   
+                            if (nombre.endsWith(".csv")) {
+                            
+                            } else if (nombre.endsWith(".json")) {
+
+                            } else if (nombre.endsWith(".xml")) {
+
+                            } else {
+                                System.out.println("Formato no compatible.");
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                    
                     break;
                 
                 case 3:
