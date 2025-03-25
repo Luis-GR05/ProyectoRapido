@@ -32,6 +32,10 @@ public class App{
                 
                 case 3:
                     break;
+                
+                case 4:
+                    System.out.println("Saliendo...");
+                    break;
                 default:
                     System.out.println("Opción no válida ");
                     break;
