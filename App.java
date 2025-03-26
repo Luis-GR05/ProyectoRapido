@@ -2,47 +2,57 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Scanner;
 
-/**
- * @author Luis Gordillo
- * @author Roberto Borrallo
- *
- */
-public class App{
+public class App {
     private static String carpetaSeleccionada = null;
     private static String ficheroSeleccionado = null;
+    private static InterfazFunciones conversor = null;
+
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int opcion;
-        FicheroJson json = new FicheroJson(); 
-        do{ 
+        
+        do {
             mostrarMenu();
             System.out.println("Introduce una opción: ");
             opcion = Integer.parseInt(sc.nextLine());
             switch (opcion) {
                 case 1:
-                    System.out.println("Introduce la ruta de la carpeta:");
-                    String path = sc.nextLine();
-                    seleccionarCarpeta(path);
+                    seleccionarCarpeta(sc);
                     break;
                 
                 case 2:
-                    System.out.println("Introduce el nombre del fichero");
+                    if (carpetaSeleccionada == null) {
+                        System.out.println("Primero selecciona una carpeta.");
+                        break;
+                    }
+                    System.out.println("Introduce el nombre del fichero:");
                     String nombre = sc.nextLine();
                     try {
                         File archivo = new File(carpetaSeleccionada, nombre);
                         if (archivo.exists() && archivo.isFile()) {
-                            ficheroSeleccionado = nombre;   
-                            json.leerFichero(archivo);
+                            ficheroSeleccionado = nombre;
+                            if (nombre.endsWith(".csv")) {
+                                conversor = new FicheroCsv();
+                            } else if (nombre.endsWith(".json")) {
+                                conversor = new FicheroJson();
+                            } else if (nombre.endsWith(".xml")) {
+                                conversor = new FicheroXml();
+                            } else {
+                                System.out.println("Formato no compatible.");
+                                break;
+                            }
+                            conversor.leerFichero(archivo);
+                        } else {
+                            System.out.println("El archivo no existe.");
                         }
                     } catch (Exception e) {
-                        System.out.println(e.getMessage());
+                        System.out.println("Error: " + e.getMessage());
                     }
-                    
                     break;
                 
                 case 3:
-                    if (ficheroSeleccionado == null || json == null) {
-                        System.out.println("Primero selecciona una carpeta y lee un fichero.");
+                    if (ficheroSeleccionado == null || conversor == null) {
+                        System.out.println("Primero selecciona y lee un fichero.");
                         break;
                     }
                     System.out.println("Selecciona formato de conversión:");
@@ -53,11 +63,13 @@ public class App{
                     
                     switch (formato) {
                         case 1:
+                            new FicheroCsv().convertirFichero(carpetaSeleccionada, nombreSalida);
                             break;
                         case 2:
-                            json.convertirFichero(carpetaSeleccionada, nombreSalida);
+                            new FicheroJson().convertirFichero(carpetaSeleccionada, nombreSalida);
                             break;
                         case 3:
+                            new FicheroXml().convertirFichero(carpetaSeleccionada, nombreSalida);
                             break;
                         default:
                             System.out.println("Opción no válida.");
@@ -68,15 +80,15 @@ public class App{
                     System.out.println("Saliendo...");
                     break;
                 default:
-                    System.out.println("Opción no válida ");
+                    System.out.println("Opción no válida");
                     break;
             }
-        }while(opcion != 4);
+        } while (opcion != 4);
         sc.close();
     }
 
-    public static void mostrarMenu(){
-        System.out.println("----Menú----\n 1- Seleccionar carpeta\n 2- Lectura de fichero \n 3- Conversión a\n 4- Salir");
+    public static void mostrarMenu() {
+        System.out.println("----Menú----\n1- Seleccionar carpeta\n2- Lectura de fichero\n3- Conversión a\n4- Salir");
         if (carpetaSeleccionada != null) {
             System.out.println("Carpeta seleccionada: " + carpetaSeleccionada);
             File carpeta = new File(carpetaSeleccionada);
@@ -88,14 +100,17 @@ public class App{
         }
     }
 
-    public static void seleccionarCarpeta(String path){
+    public static void seleccionarCarpeta(Scanner sc) {
+        System.out.println("Introduce la ruta de la carpeta:");
+        String path = sc.nextLine().trim();
+        
         File carpeta = new File(path);
         if (carpeta.exists() && carpeta.isDirectory()) {
-            carpetaSeleccionada = path;
-            System.out.println("Carpeta seleccionada correctamente.");
+            carpetaSeleccionada = carpeta.getAbsolutePath();
+            ficheroSeleccionado = null;
+            System.out.println("Carpeta seleccionada correctamente: " + carpetaSeleccionada);
         } else {
-            System.out.println("La carpeta no existe.");
+            System.out.println("La carpeta no existe. Ruta probada: " + carpeta.getAbsolutePath());
         }
     }
 }
-
