@@ -12,7 +12,8 @@ public class App{
     private static String ficheroSeleccionado = null;
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        int opcion; 
+        int opcion;
+        FicheroJson json = new FicheroJson(); 
         do{ 
             mostrarMenu();
             System.out.println("Introduce una opción: ");
@@ -20,7 +21,8 @@ public class App{
             switch (opcion) {
                 case 1:
                     System.out.println("Introduce la ruta de la carpeta:");
-                    seleccionarCarpeta(sc.nextLine());
+                    String path = sc.nextLine();
+                    seleccionarCarpeta(path);
                     break;
                 
                 case 2:
@@ -29,16 +31,8 @@ public class App{
                     try {
                         File archivo = new File(carpetaSeleccionada, nombre);
                         if (archivo.exists() && archivo.isFile()) {
-                        ficheroSeleccionado = nombre;   
-                            if (nombre.endsWith(".csv")) {
-                            
-                            } else if (nombre.endsWith(".json")) {
-
-                            } else if (nombre.endsWith(".xml")) {
-
-                            } else {
-                                System.out.println("Formato no compatible.");
-                            }
+                            ficheroSeleccionado = nombre;   
+                            json.leerFichero(archivo);
                         }
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
@@ -47,6 +41,27 @@ public class App{
                     break;
                 
                 case 3:
+                    if (ficheroSeleccionado == null || json == null) {
+                        System.out.println("Primero selecciona una carpeta y lee un fichero.");
+                        break;
+                    }
+                    System.out.println("Selecciona formato de conversión:");
+                    System.out.println("1. CSV\n2. JSON\n3. XML");
+                    int formato = Integer.parseInt(sc.nextLine());
+                    System.out.println("Introduce el nombre del fichero de salida (sin extensión):");
+                    String nombreSalida = sc.nextLine();
+                    
+                    switch (formato) {
+                        case 1:
+                            break;
+                        case 2:
+                            json.convertirFichero(carpetaSeleccionada, nombreSalida);
+                            break;
+                        case 3:
+                            break;
+                        default:
+                            System.out.println("Opción no válida.");
+                    }
                     break;
                 
                 case 4:
