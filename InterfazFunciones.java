@@ -1,4 +1,6 @@
+import java.io.File;
+
 public interface InterfazFunciones {
-    void leerFichero();
-    void convertirFichero();
+    void leerFichero(File archivo);
+    void convertirFichero(String carpetaSeleccionada, String nombreSalida);
 }
