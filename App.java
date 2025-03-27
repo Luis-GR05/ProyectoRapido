@@ -1,11 +1,18 @@
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Scanner;
 
 public class App {
     private static String carpetaSeleccionada = null;
     private static String ficheroSeleccionado = null;
     private static InterfazFunciones conversor = null;
+    private static List<LinkedHashMap<String, String>> datos = new ArrayList<>();
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
@@ -22,32 +29,11 @@ public class App {
                 
                 case 2:
                     if (carpetaSeleccionada == null) {
-                        System.out.println("Primero selecciona una carpeta.");
-                        break;
+                        System.out.println("Debe seleccionar una carpeta primero.");
+                    }else{
+                        leerFichero(sc);
                     }
-                    System.out.println("Introduce el nombre del fichero:");
-                    String nombre = sc.nextLine();
-                    try {
-                        File archivo = new File(carpetaSeleccionada, nombre);
-                        if (archivo.exists() && archivo.isFile()) {
-                            ficheroSeleccionado = nombre;
-                            if (nombre.endsWith(".csv")) {
-                                conversor = new FicheroCsv();
-                            } else if (nombre.endsWith(".json")) {
-                                conversor = new FicheroJson();
-                            } else if (nombre.endsWith(".xml")) {
-                                conversor = new FicheroXml();
-                            } else {
-                                System.out.println("Formato no compatible.");
-                                break;
-                            }
-                            conversor.leerFichero(archivo);
-                        } else {
-                            System.out.println("El archivo no existe.");
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Error: " + e.getMessage());
-                    }
+                    
                     break;
                 
                 case 3:
@@ -112,5 +98,33 @@ public class App {
         } else {
             System.out.println("La carpeta no existe. Ruta probada: " + carpeta.getAbsolutePath());
         }
+    }
+
+    public static void leerFichero(Scanner sc){
+        System.out.print("Ingrese el nombre del ficheroa leer: ");
+        String nombreFichero = sc.nextLine();
+        File archivo = new File(carpetaSeleccionada, nombreFichero);
+
+        if (!archivo.exists() || !archivo.isFile()) {
+            System.out.println("El fichero no existe o no es un fichero");
+        } else{
+            datos.clear(); 
+            try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+                String linea;
+                while ((linea = br.readLine()) != null) {
+                    String[] valores = linea.split(","); 
+                    LinkedHashMap<String, String> fila = new LinkedHashMap<>();
+                    for (int i = 0; i < valores.length; i++) {
+                        fila.put("Columna" + (i + 1), valores[i]); 
+                    }
+                    datos.add(fila);
+                }
+                System.out.println("Archivo leído correctamente.");
+            } catch (Exception e) {
+                System.out.println("Error al leer el fichero, error: " + e.getMessage());
+            }
+        }
+
+        
     }
 }
