@@ -1,60 +1,52 @@
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
-/**
- * @author Luis Gordillo
- * @author Roberto Borrallo
- *
- */
 public class App {
     private static String carpetaSeleccionada = null;
     private static String ficheroSeleccionado = null;
+    private static List<LinkedHashMap<String, String>> datos = new ArrayList<>();
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int opcion;
+        
         do {
             mostrarMenu();
             System.out.println("Introduce una opción: ");
             opcion = Integer.parseInt(sc.nextLine());
             switch (opcion) {
                 case 1:
-                    System.out.println("Introduce la ruta de la carpeta:");
-                    seleccionarCarpeta(sc.nextLine());
+                    seleccionarCarpeta(sc);
                     break;
-
+                
                 case 2:
-                    if (carpetaSeleccionada != null) {
-                        System.out.print("Introduce el nombre del archivo a leer: ");
-                        String nombreArchivo = sc.nextLine();
-                        leerArchivo(nombreArchivo);
-                    } else {
-                        System.out.println("Primero debes seleccionar una carpeta.");
+                    if (carpetaSeleccionada == null) {
+                        System.out.println("Debe seleccionar una carpeta primero.");
+                    }else{
+                        leerFichero(sc);
+                    }
+                    
+                    break;
+                
+                case 3:
+                    if (datos.isEmpty()) {
+                        System.out.println("No hay datos de ningún archivo");
+                    }else{
+                        convertir(sc);
                     }
                     break;
-
-                case 3:
-                if (lectorActual != null) {
-                    System.out.print("Formato de destino (CSV, JSON, XML): ");
-                    String formatoDestino = sc.nextLine();
-                    System.out.print("Nombre del archivo de salida (sin extensión): ");
-                    String nombreSalida = sc.nextLine();
-                    lectorActual.convertirFichero(formatoDestino, 
-                        carpetaSeleccionada + File.separator + nombreSalida);
-                } else {
-                    System.out.println("Primero debes leer un archivo.");
-                }
-                    break;
-
+                
                 case 4:
                     System.out.println("Saliendo...");
                     break;
                 default:
-                    System.out.println("Opción no válida ");
+                    System.out.println("Opción no válida");
                     break;
             }
         } while (opcion != 4);
@@ -62,8 +54,7 @@ public class App {
     }
 
     public static void mostrarMenu() {
-        System.out
-                .println("----Menú----\n 1- Seleccionar carpeta\n 2- Lectura de fichero \n 3- Conversión a\n 4- Salir");
+        System.out.println("----Menú----\n1- Seleccionar carpeta\n2- Lectura de fichero\n3- Conversión a\n4- Salir");
         if (carpetaSeleccionada != null) {
             System.out.println("Carpeta seleccionada: " + carpetaSeleccionada);
             File carpeta = new File(carpetaSeleccionada);
@@ -75,38 +66,52 @@ public class App {
         }
     }
 
-    public static void seleccionarCarpeta(String path) {
+    public static void seleccionarCarpeta(Scanner sc) {
+        System.out.println("Introduce la ruta de la carpeta:");
+        String path = sc.nextLine().trim();
+        
         File carpeta = new File(path);
         if (carpeta.exists() && carpeta.isDirectory()) {
-            carpetaSeleccionada = path;
-            System.out.println("Carpeta seleccionada correctamente.");
+            carpetaSeleccionada = carpeta.getAbsolutePath();
+            ficheroSeleccionado = null;
+            System.out.println("Carpeta seleccionada correctamente: " + carpetaSeleccionada);
         } else {
-            System.out.println("La carpeta no existe.");
+            System.out.println("La carpeta no existe. Ruta probada: " + carpeta.getAbsolutePath());
         }
     }
 
-    private static void leerArchivo(String nombreArchivo) {
-        File archivo = new File(carpetaSeleccionada + File.separator + nombreArchivo);
-        if (!archivo.exists()) {
-            System.out.println("El archivo no existe.");
-            return;
-        }
+    public static void leerFichero(Scanner sc){
+        System.out.print("Ingrese el nombre del ficheroa leer: ");
+        String nombreFichero = sc.nextLine();
+        File archivo = new File(carpetaSeleccionada, nombreFichero);
 
-        ficheroSeleccionado = nombreArchivo;
+        if (!archivo.exists() || !archivo.isFile()) {
+            System.out.println("El fichero no existe o no es un fichero");
+        } else{
+            datos.clear(); 
+            try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+                String linea;
+                while ((linea = br.readLine()) != null) {
+                    String[] valores = linea.split(","); 
+                    LinkedHashMap<String, String> fila = new LinkedHashMap<>();
+                    for (int i = 0; i < valores.length; i++) {
+                        fila.put("Columna" + (i + 1), valores[i]); 
+                    }
+                    datos.add(fila);
+                }
+                System.out.println("Archivo leído correctamente.");
+            } catch (Exception e) {
+                System.out.println("Error al leer el fichero, error: " + e.getMessage());
+            }
+        }
+    }
+
+    public static void convertir(Scanner sc){
+        System.out.print("Seleccione el formato del fichero de salida:\n 1- JSON\n 2- CSV\n 3- XML ");
+        String formatoSeleccionado = sc.nextLine().toUpperCase();
+        System.out.print("Ingrese el nombre del archivo de salida: ");
+        String nombreArchivoSalida = sc.nextLine() + "." + formatoSeleccionado;
+        File archivoSalida = new File(carpetaSeleccionada, nombreArchivoSalida);
         
-        if (nombreArchivo.endsWith(".csv")) {
-            lectorActual = new FicheroCsv();
-        } else if (nombreArchivo.endsWith(".json")) {
-            lectorActual = new FicheroJson();
-        } else if (nombreArchivo.endsWith(".xml")) {
-            lectorActual = new FicheroXml();
-        } else {
-            System.out.println("Formato de archivo no soportado.");
-            return;
-        }
-
-        lectorActual.leerFichero(archivo);
     }
-
-
 }
