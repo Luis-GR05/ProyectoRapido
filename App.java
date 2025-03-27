@@ -112,6 +112,27 @@ public class App {
         System.out.print("Ingrese el nombre del archivo de salida: ");
         String nombreArchivoSalida = sc.nextLine() + "." + formatoSeleccionado;
         File archivoSalida = new File(carpetaSeleccionada, nombreArchivoSalida);
-        
+        if(formatoSeleccionado.equals("JSON")){
+            try{
+                FicheroJson.convertirFichero(datos, archivoSalida);
+            } catch(Exception e){
+                System.out.println("Error al convertir el fichero a JSON: " + e.getMessage());
+            }
+        } else if(formatoSeleccionado.equals("CSV")){
+            try{
+                FicheroCsv.convertirFichero(datos, archivoSalida);
+            } catch(Exception e){
+                System.out.println("Error al convertir el fichero a JSON: " + e.getMessage());
+            }
+        } else if(formatoSeleccionado.equals("XML")){
+            try{
+                FicheroXml.convertirFichero(datos, archivoSalida);
+            } catch(Exception e){
+                System.out.println("Error al convertir el fichero a JSON: " + e.getMessage());
+            }
+        } else{
+            System.out.println("Formato no soportado");
+        }
+
     }
 }
