@@ -10,7 +10,6 @@ import java.util.Scanner;
 public class App {
     private static String carpetaSeleccionada = null;
     private static String ficheroSeleccionado = null;
-    private static InterfazFunciones conversor = null;
     private static List<LinkedHashMap<String, String>> datos = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -36,28 +35,10 @@ public class App {
                     break;
                 
                 case 3:
-                    if (ficheroSeleccionado == null || conversor == null) {
-                        System.out.println("Primero selecciona y lee un fichero.");
-                        break;
-                    }
-                    System.out.println("Selecciona formato de conversión:");
-                    System.out.println("1. CSV\n2. JSON\n3. XML");
-                    int formato = Integer.parseInt(sc.nextLine());
-                    System.out.println("Introduce el nombre del fichero de salida (sin extensión):");
-                    String nombreSalida = sc.nextLine();
-                    
-                    switch (formato) {
-                        case 1:
-                            new FicheroCsv().convertirFichero(carpetaSeleccionada, nombreSalida);
-                            break;
-                        case 2:
-                            new FicheroJson().convertirFichero(carpetaSeleccionada, nombreSalida);
-                            break;
-                        case 3:
-                            new FicheroXml().convertirFichero(carpetaSeleccionada, nombreSalida);
-                            break;
-                        default:
-                            System.out.println("Opción no válida.");
+                    if (datos.isEmpty()) {
+                        System.out.println("No hay datos de ningún archivo");
+                    }else{
+                        convertir(sc);
                     }
                     break;
                 
@@ -123,7 +104,35 @@ public class App {
                 System.out.println("Error al leer el fichero, error: " + e.getMessage());
             }
         }
+    }
 
-        
+    public static void convertir(Scanner sc){
+        System.out.print("Seleccione el formato del fichero de salida:\n 1- JSON\n 2- CSV\n 3- XML ");
+        String formatoSeleccionado = sc.nextLine().toUpperCase();
+        System.out.print("Ingrese el nombre del archivo de salida: ");
+        String nombreArchivoSalida = sc.nextLine() + "." + formatoSeleccionado;
+        File archivoSalida = new File(carpetaSeleccionada, nombreArchivoSalida);
+        if(formatoSeleccionado.equals("JSON")){
+            try{
+                FicheroJson.convertirFichero(datos, archivoSalida);
+            } catch(Exception e){
+                System.out.println("Error al convertir el fichero a JSON: " + e.getMessage());
+            }
+        } else if(formatoSeleccionado.equals("CSV")){
+            try{
+                FicheroCsv.convertirFichero(datos, archivoSalida);
+            } catch(Exception e){
+                System.out.println("Error al convertir el fichero a JSON: " + e.getMessage());
+            }
+        } else if(formatoSeleccionado.equals("XML")){
+            try{
+                FicheroXml.convertirFichero(datos, archivoSalida);
+            } catch(Exception e){
+                System.out.println("Error al convertir el fichero a JSON: " + e.getMessage());
+            }
+        } else{
+            System.out.println("Formato no soportado");
+        }
+
     }
 }
