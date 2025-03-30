@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * @author Luis Gordillo Rodrígez
+ * @author Luis Gordillo Rodríguez
  * @author Roberto Borrallo Álvarez
  */
 public class App {
