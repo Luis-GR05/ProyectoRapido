@@ -1,6 +1,10 @@
 import java.io.*;
 import java.util.*;
 
+/**
+ * @author Luis Gordillo Rodrígez
+ * @author Roberto Borrallo Álvarez
+ */
 public class FicheroXml {
     public static void convertirFichero(List<LinkedHashMap<String, String>> datosArchivo, File archivoSalida)
             throws IOException {

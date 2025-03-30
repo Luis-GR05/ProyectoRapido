@@ -1,8 +1,13 @@
 import java.io.*;
 import java.util.*;
 
+/**
+ * @author Luis Gordillo Rodrígez
+ * @author Roberto Borrallo Álvarez
+ */
 public class FicheroJson {
-    public static void convertirFichero(List<LinkedHashMap<String, String>> datos, File archivoSalida) throws IOException {
+    public static void convertirFichero(List<LinkedHashMap<String, String>> datos, File archivoSalida)
+            throws IOException {
         String json = "[\n";
         for (int i = 0; i < datos.size(); i++) {
             LinkedHashMap<String, String> mapa = datos.get(i);

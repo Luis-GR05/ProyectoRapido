@@ -1,6 +1,10 @@
 import java.io.*;
 import java.util.*;
 
+/**
+ * @author Luis Gordillo Rodrígez
+ * @author Roberto Borrallo Álvarez
+ */
 public class App {
     private static String carpetaSeleccionada = null;
     private static String ficheroSeleccionado = null;
@@ -89,9 +93,9 @@ public class App {
             if (nombre.endsWith(".csv")) {
                 leerCSV(archivo);
             } else if (nombre.endsWith(".json")) {
-
+                leerJSON(archivo);
             } else if (nombre.endsWith(".xml")) {
-                
+                leerXML(archivo);
             } else {
                 System.out.println("Formato no soportado");
             }
@@ -125,6 +129,69 @@ public class App {
             lector.close();
             System.out.println("CSV leído correctamente");
         }
+    }
+
+    private static void leerJSON(File archivo) throws IOException {
+        BufferedReader lector = new BufferedReader(new FileReader(archivo));
+        String linea;
+        String contenido = "";
+        while ((linea = lector.readLine()) != null) {
+            contenido += linea.trim();
+        }
+        lector.close();
+        contenido = contenido.substring(1, contenido.length() - 1);
+        String[] objetos = contenido.split("\\},\\s*\\{");
+        for (String obj : objetos) {
+            obj = obj.replaceAll("[{}]", "");
+            LinkedHashMap<String, String> fila = new LinkedHashMap<>();
+            String[] campos = obj.split(",");
+            for (String campo : campos) {
+                String[] partes = campo.split(":", 2);
+                if (partes.length == 2) {
+                    String clave = partes[0].trim().replaceAll("\"", "");
+                    String valor = partes[1].trim().replaceAll("\"", "");
+                    fila.put(clave, valor);
+                }
+            }
+            datos.add(fila);
+        }
+        System.out.println("JSON leído correctamente");
+    }
+
+    private static void leerXML(File archivo) throws IOException {
+        BufferedReader lector = new BufferedReader(new FileReader(archivo));
+        String linea;
+        String contenido = "";
+        while ((linea = lector.readLine()) != null) {
+            contenido += linea.trim();
+        }
+        lector.close();
+        String etiqueta = contenido.contains("<coche>") ? "coche" : "fila";
+        String[] registros = contenido.split("<" + etiqueta + ">");
+
+        for (int i = 1; i < registros.length; i++) {
+            String registro = registros[i];
+            int fin = registro.indexOf("</" + etiqueta + ">");
+            if (fin == -1) {
+
+                registro = registro.substring(0, fin);
+                LinkedHashMap<String, String> fila = new LinkedHashMap<>();
+                String[] lineas = registro.split("<");
+
+                for (String l : lineas) {
+                    if (l.isEmpty()) {
+                        int separador = l.indexOf(">");
+                        if (separador == -1) {
+                            String clave = l.substring(0, separador);
+                            String valor = l.substring(separador + 1);
+                            fila.put(clave, valor);
+                        }
+                    }
+                }
+                datos.add(fila);
+            }
+        }
+        System.out.println("XML leído correctamente");
     }
 
     public static void convertir(Scanner sc) {
